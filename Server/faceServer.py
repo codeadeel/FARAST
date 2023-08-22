@@ -27,7 +27,7 @@ class faceService(faceCommunication_pb2_grpc.faceServiceServicer):
         """
         self.clientPool = dict()
     
-    def __requestProcessor__(self, inpReq) -> tuple:
+    def __requestProcessor__(self, inpReq: faceCommunication_pb2.serverInput) -> tuple:
         """
         This method is used to process input request
 

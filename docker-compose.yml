@@ -49,6 +49,9 @@ services:
               capabilities: [gpu]
     depends_on:
       - bucketStorage
+    profiles:
+      - fullInference
+      - minimal
 
   inferenceServerREST:
     build:
@@ -69,6 +72,8 @@ services:
       - faceNetwork
     depends_on:
       - inferenceServerGRPC
+    profiles:
+      - fullInference
 
   liveDemoFace:
     build:
@@ -80,12 +85,16 @@ services:
     expose:
       - 8080
     environment:
+      - meshModel=/home/faceMesh.task
       - serverIP=facegrpcinference:8080
     networks:
       - faceNetwork
     depends_on:
       - inferenceServerGRPC
       - bucketStorage
+    profiles:
+      - fullInference
+      - minimal
   
   enrollFace:
     build:
@@ -109,6 +118,9 @@ services:
     depends_on:
       - inferenceServerGRPC
       - bucketStorage
+    profiles:
+      - fullInference
+      - minimal
   
   bucketStorage:
     image: minio/minio:latest
@@ -126,6 +138,9 @@ services:
       - MINIO_ROOT_PASSWORD=face1234
     networks:
       - faceNetwork
+    profiles:
+      - fullInference
+      - minimal
   
   virtRouter:
     image: nginx:latest
@@ -145,6 +160,35 @@ services:
     depends_on:
       - inferenceServerGRPC
       - bucketStorage
+    profiles:
+      - fullInference
+      - minimal
+  
+  faceTrainer:
+    build:
+        context: .
+        dockerfile: BuildTrainer.Dockerfile
+    image: codeadeel/face:trainer
+    container_name: faceTrainer
+    hostname: facetrainer
+    volumes:
+      - ./Data:/data
+      - ./Resources:/output
+    environment:
+      - batchSize=10
+      - epochs=10
+      - workers=8
+    networks:
+      - faceNetwork
+    deploy:
+      resources:
+        reservations:
+          devices:
+            - driver: nvidia
+              count: 1
+              capabilities: [gpu]
+    profiles:
+      - trainer
 
 networks:
   faceNetwork:
