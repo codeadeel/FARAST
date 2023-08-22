@@ -1,0 +1,62 @@
+name: DockerHub Image Push
+
+on:
+  workflow_dispatch:
+  push:
+    branches: [ "main" ]
+
+jobs:
+  GPU-Builds:
+    runs-on: ubuntu-latest
+    steps:
+    
+    - name: main Branch Checkout
+      uses: actions/checkout@v3
+
+    - name: Download Training Model
+      run: wget -O ./Resources/yolo_nas_s_coco.pth https://storage.googleapis.com/codeadeel-github/FARAST/yolo_nas_s_coco.pth
+
+    - name: Docker Login
+      run: docker login -u ${{secrets.DOCKER_USER}} -p ${{secrets.DOCKER_PASSWORD}}
+
+    - name: Build GRPC Server
+      run: docker build -t ${{secrets.DOCKER_USER}}/face:grpcserver -f BuildGRPCServer.Dockerfile .
+    - name: Push GRPC Server
+      run: docker push ${{secrets.DOCKER_USER}}/face:grpcserver
+    - name: Residue Removal
+      run: docker rmi $(docker images -a -q)
+
+    - name: Build Trainer
+      run: docker build -t ${{secrets.DOCKER_USER}}/face:trainer -f BuildTrainer.Dockerfile .
+    - name: Push Trainer
+      run: docker push ${{secrets.DOCKER_USER}}/face:trainer
+    - name: Residue Removal
+      run: docker rmi $(docker images -a -q)
+
+  CPU-Builds:
+    runs-on: ubuntu-latest
+    steps:
+    
+    - name: main Branch Checkout
+      uses: actions/checkout@v3
+
+    - name: Download Face Mesh Model
+      run: wgwget -O ./Resources/faceMesh.task https://storage.googleapis.com/codeadeel-github/FARAST/faceMesh.task
+
+    - name: Docker Login
+      run: docker login -u ${{secrets.DOCKER_USER}} -p ${{secrets.DOCKER_PASSWORD}}
+
+    - name: Build REST API Server
+      run: docker build -t ${{secrets.DOCKER_USER}}/face:restserver -f BuildRESTServer.Dockerfile .
+    - name: Push REST API Server
+      run: docker push ${{secrets.DOCKER_USER}}/face:restserver
+
+    - name: Build Face Live Demo
+      run: docker build -t ${{secrets.DOCKER_USER}}/face:livedemo -f BuildLiveDemo.Dockerfile .
+    - name: Push Face Live Demo
+      run: docker push ${{secrets.DOCKER_USER}}/face:livedemo
+      
+    - name: Build Face Enrollment Demo
+      run: docker build -t ${{secrets.DOCKER_USER}}/face:enrollment -f BuildEnrollment.Dockerfile .
+    - name: Push Face Enrollment Demo
+      run: docker push ${{secrets.DOCKER_USER}}/face:enrollment
