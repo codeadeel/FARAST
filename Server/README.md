@@ -97,7 +97,7 @@ export apiRoute=/face                           # REST API inference route
 Client scripts are used to request images for inference to server. In simple words, they send batch of images to inference server, and return results after process. Usage for this [script][inc] is given as following:
 
 ```python
-from inferenceGRPCClient import *
+from inferenceRESTClient import *
 
 face_analytics_inference_server_ip = 'http://172.17.0.2:8080/face'
 clientID = 'Your-ID'
