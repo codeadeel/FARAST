@@ -11,5 +11,8 @@ The subject repository assumes the role of overseeing Face Analytics. The underl
 * Advanced Face Recognition Capabilities
 * Effective Batched Multi-Stream Face Tracking
 
+##### For extensive documentation, please check [***wiki***](https://github.com/codeadeel/FARAST/wiki).
+
 [architecture]: ./MarkDown-Data/architecture.jpg
 [datasetLink]: http://shuoyang1213.me/WIDERFACE/
+[dockerBadge]: [dockerBadge]: https://github.com/codeadeel/FARAST/actions/workflows/dockerPush.yml/badge.svg?event=push
