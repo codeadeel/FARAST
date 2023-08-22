@@ -15,4 +15,4 @@ The subject repository assumes the role of overseeing Face Analytics. The underl
 
 [architecture]: ./MarkDown-Data/architecture.jpg
 [datasetLink]: http://shuoyang1213.me/WIDERFACE/
-[dockerBadge]: [dockerBadge]: https://github.com/codeadeel/FARAST/actions/workflows/dockerPush.yml/badge.svg?event=push
+[dockerBadge]: https://github.com/codeadeel/FARAST/actions/workflows/dockerPush.yml/badge.svg?event=push
