@@ -41,7 +41,7 @@ jobs:
       uses: actions/checkout@v3
 
     - name: Download Face Mesh Model
-      run: wgwget -O ./Resources/faceMesh.task https://storage.googleapis.com/codeadeel-github/FARAST/faceMesh.task
+      run: wget -O ./Resources/faceMesh.task https://storage.googleapis.com/codeadeel-github/FARAST/faceMesh.task
 
     - name: Docker Login
       run: docker login -u ${{secrets.DOCKER_USER}} -p ${{secrets.DOCKER_PASSWORD}}
