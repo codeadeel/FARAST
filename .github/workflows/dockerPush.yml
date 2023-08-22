@@ -26,12 +26,12 @@ jobs:
     - name: Residue Removal
       run: docker rmi $(docker images -a -q)
 
-    - name: Build Trainer
-      run: docker build -t ${{secrets.DOCKER_USER}}/face:trainer -f BuildTrainer.Dockerfile .
-    - name: Push Trainer
-      run: docker push ${{secrets.DOCKER_USER}}/face:trainer
-    - name: Residue Removal
-      run: docker rmi $(docker images -a -q)
+    # - name: Build Trainer
+    #   run: docker build -t ${{secrets.DOCKER_USER}}/face:trainer -f BuildTrainer.Dockerfile .
+    # - name: Push Trainer
+    #   run: docker push ${{secrets.DOCKER_USER}}/face:trainer
+    # - name: Residue Removal
+    #   run: docker rmi $(docker images -a -q)
 
   CPU-Builds:
     runs-on: ubuntu-latest
