@@ -137,6 +137,7 @@ streamerRTC = webrtc_streamer(
     key = 'face',
     mode = WebRtcMode.SENDRECV,
     video_frame_callback = frameProcessor,
+    # rtc_configuration={"iceServers": [{"urls": ["stun:stun.l.google.com:19302"]}]},
     media_stream_constraints = {'video': True, 'audio': False},
     async_processing = True
 )

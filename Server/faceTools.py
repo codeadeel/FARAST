@@ -266,7 +266,7 @@ class Inference:
 
             # Landmarks Mapping, Face Alignment & Resize
             alignedFaces = list()
-            spoofFaces = list()
+            spoofOutList = list()
             hei, wi = img.dataShape[:2]
             for k, l in zip(rawLandmarks, probWBox):
                 k[:, 0] *= int(l[3] - l[1])
@@ -285,25 +285,23 @@ class Inference:
                 alignedFaces.append(
                     (ocv.resize(finalImg, (self.recognitionWidth, self.recognitionHeight)) / 255)[np.newaxis, ...]
                 )
-                spoofFaces.append(
-                    ocv.resize(finalImg, (self.spoofWidth, self.spoofHeight)).transpose(2, 0, 1)[np.newaxis, ...]
-                )
+                sR = self.spoofingSession.run(None, {
+                    "actual_input_1": ocv.resize(finalImg, (self.spoofWidth, self.spoofHeight)).transpose(2, 0, 1)[np.newaxis, ...].astype(np.float32)
+                })[0][0]
+                if sR[0]>=img.fakenessThreshold:
+                    spoofOutList.append('Real')
+                else:
+                    spoofOutList.append('Fake')
             alignedFaces = np.concatenate(alignedFaces)
+            finalSpoofList.append(spoofOutList)
 
             # Face Embeddings
             preEmbeddings, preLabels = self.__getPreFaces__()
             if len(preEmbeddings)==0:
-                finalFaceProability.append(['Unknown'] * len(alignedFaces))
-                finalFaceLabels.append([0] * len(alignedFaces))
+                finalFaceLabels.append(['Unknown'] * len(alignedFaces))
+                finalFaceProability.append([0] * len(alignedFaces))
             else:
                 faceEmbeddings = self.recognitionSession.run(None, {"input_2": alignedFaces.astype(np.float32)})[0]
-                spoofOutList = list()
-                for sF in spoofFaces:
-                    sR = self.spoofingSession.run(None, {"actual_input_1": sF.astype(np.float32)})[0][0]
-                    if sR[0]>=img.fakenessThreshold:
-                        spoofOutList.append('Real')
-                    else:
-                        spoofOutList.append('Fake')
                 faceSim = torch.nn.functional.cosine_similarity(torch.Tensor(faceEmbeddings).unsqueeze(1), torch.Tensor(preEmbeddings), dim=2, eps=1e-6)
                 faceMaxProb, faceMaxInd = torch.max(faceSim, axis=1)
                 faceRetLab = np.array(preLabels)[faceMaxInd.numpy()]
@@ -312,9 +310,8 @@ class Inference:
                 faceRetLab = np.where(probBArea >= img.smallFaceAreaPercentage, faceRetLab, 'Small Face')
                 finalFaceProability.append(faceMaxProb.tolist())
                 finalFaceLabels.append(faceRetLab.tolist())
-                finalSpoofList.append(spoofOutList)
         return finalBBOXsRaw, finalRawLandmarks, finalFaceProability, finalFaceLabels, finalSpoofList
-
+        
 # Stream Handler
 class streamClient:
     def __init__(self, clientId: string) -> None:
